@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모든세대교회 교인 정보 등록</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .card-header .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .card-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 6px;
+    }
+
+    .card-header p {
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 7px;
+      letter-spacing: 0.01em;
+    }
+
+    .form-label .req {
+      color: #e53e3e;
+      margin-left: 3px;
+    }
+
+    .form-label .opt {
+      font-size: 11px;
+      font-weight: 400;
+      color: #a0aec0;
+      margin-left: 4px;
+    }
+
+    input[type="text"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #2d3748;
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+
+    input.has-error {
+      border-color: #fc8181;
+    }
+
+    .error-msg {
+      font-size: 12px;
+      color: #e53e3e;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .radio-option {
+      flex: 1;
+    }
+
+    .radio-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 13px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+      font-weight: 500;
+      color: #718096;
+      user-select: none;
+    }
+
+    .radio-option input[type="radio"]:checked + label {
+      border-color: #667eea;
+      background: #ebf4ff;
+      color: #434190;
+      font-weight: 600;
+    }
+
+    .radio-option label:hover {
+      border-color: #667eea;
+      background: #f7f5ff;
+    }
+
+    .gender-error {
+      font-size: 12px;
+      color: #e53e3e;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .address-wrapper {
+      position: relative;
+    }
+
+    .address-search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 6px 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .address-search-btn:hover {
+      background: #5a67d8;
+    }
+
+    #address {
+      padding-right: 90px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #f0f0f0;
+      margin: 24px 0;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.03em;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .success-section {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .success-section .check-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+    }
+
+    .success-section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .success-section p {
+      font-size: 14px;
+      color: #718096;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 28px 20px;
+      }
+    }
+
+    .family-section {
+      background: #f8f9ff;
+      border: 1.5px solid #dde3f5;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .family-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .family-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4a5568;
+    }
+
+    .family-remove-btn {
+      background: none;
+      border: 1px solid #fc8181;
+      color: #e53e3e;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .family-remove-btn:hover {
+      background: #fff5f5;
+    }
+
+    .add-family-btn {
+      width: 100%;
+      padding: 13px;
+      background: white;
+      border: 2px dashed #cbd5e0;
+      border-radius: 10px;
+      color: #718096;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: all 0.15s;
+    }
+
+    .add-family-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+      background: #f7f5ff;
+    }
+
+    .consent-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .consent-detail {
+      font-size: 12px;
+      color: #718096;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .consent-detail strong {
+      color: #4a5568;
+      font-weight: 600;
+    }
+
+    .consent-toggle {
+      font-size: 11px;
+      color: #667eea;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 10px;
+      display: block;
+      text-decoration: underline;
+    }
+
+    .consent-check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .consent-check-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .consent-check-row span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .consent-check-row .req {
+      color: #e53e3e;
+      margin-left: 2px;
+    }
+
+    .consent-error {
+      font-size: 12px;
+      color: #e53e3e;
+      margin-top: 6px;
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- 폼 섹션 -->
+    <div id="formSection">
+      <div class="card-header">
+        <div class="icon">⛪</div>
+        <h1>모든세대교회</h1>
+        <p>교인 정보 등록을 환영합니다<br>편하게 작성해 주시면 소중히 관리하겠습니다</p>
+      </div>
+
+      <form id="contactForm" novalidate>
+
+        <div class="form-group">
+          <label class="form-label" for="name">이름 <span class="req">*</span></label>
+          <input type="text" id="name" name="name" placeholder="홍길동" autocomplete="name">
+          <div class="error-msg" id="nameError">이름을 입력해 주세요.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">전화번호 <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric">
+          <div class="error-msg" id="phoneError">올바른 전화번호를 입력해 주세요.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="birthday">생년월일 <span class="req">*</span></label>
+          <input type="text" id="birthday" name="birthday" placeholder="예: 1982/07/18" inputmode="numeric" maxlength="10">
+          <div class="error-msg" id="birthdayError">생년월일을 입력해 주세요. (예: 1982/07/18)</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">성별 <span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="male" name="gender" value="남성">
+              <label for="male">남성</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="female" name="gender" value="여성">
+              <label for="female">여성</label>
+            </div>
+          </div>
+          <div class="gender-error" id="genderError">성별을 선택해 주세요.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address">주소 <span class="req">*</span></label>
+          <div class="address-wrapper">
+            <input type="text" id="address" name="address" placeholder="검색 버튼을 눌러 주소를 선택해 주세요">
+            <button type="button" class="address-search-btn" onclick="searchAddress()">검색</button>
+          </div>
+          <div class="error-msg" id="addressError">주소를 입력해 주세요.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="addressDetail">상세 주소 <span class="opt">(선택)</span></label>
+          <input type="text" id="addressDetail" name="addressDetail" placeholder="동/호수, 층 등">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="carNumber">차량번호 <span class="opt">(선택)</span></label>
+          <input type="text" id="carNumber" name="carNumber" placeholder="예: 12가 3456">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">세례 여부 <span class="opt">(선택)</span></label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="baptism_regular" name="baptism" value="세례(입교)">
+              <label for="baptism_regular">세례(입교)</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="baptism_infant" name="baptism" value="유아세례">
+              <label for="baptism_infant">유아세례</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="baptism_none" name="baptism" value="받지않음">
+              <label for="baptism_none">받지않음</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="familyList"></div>
+
+        <button type="button" class="add-family-btn" onclick="addFamilyMember()">+ 가족 정보 추가</button>
+
+        <div class="consent-box">
+          <button type="button" class="consent-toggle" onclick="toggleConsent()">개인정보 수집·이용 안내 보기 ▾</button>
+          <div id="consentDetail" class="consent-detail" style="display:none;">
+            <strong>수집 항목</strong><br>
+            이름, 전화번호, 생년월일, 성별, 주소, 차량번호<br><br>
+            <strong>수집 목적</strong><br>
+            교인 관리, 목회 사역 및 교회 행사 안내<br><br>
+            <strong>보유 및 이용 기간</strong><br>
+            교인 재적 기간 동안 보유하며, 탈퇴 또는 본인 요청 시 즉시 파기<br><br>
+            귀하는 개인정보 수집·이용에 동의하지 않을 권리가 있으며,
+            동의 거부 시 교인 정보 등록이 제한될 수 있습니다.
+          </div>
+          <label class="consent-check-row">
+            <input type="checkbox" id="consentCheck">
+            <span>개인정보 수집·이용에 동의합니다 <span class="req">*</span></span>
+          </label>
+          <div class="consent-error" id="consentError">개인정보 수집·이용에 동의해 주세요.</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">제출하기</button>
+
+      </form>
+    </div>
+
+    <!-- 완료 섹션 -->
+    <div class="success-section" id="successSection">
+      <div class="check-icon">✅</div>
+      <h2>등록이 완료되었습니다!</h2>
+      <p>모든세대교회와 함께해 주셔서 감사합니다.<br>소중한 정보는 안전하게 보관하겠습니다.</p>
+    </div>
+
+  </div>
+
+  <!-- 카카오 주소 API -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+  <script>
+    // ★ Google Apps Script 웹앱 URL을 여기에 붙여넣으세요
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2Brvo8kDy90_f3HvznL3ER6r-POJ7FtgG89ZcDniVm3op5eZsVIpKWtpD4wn9fS8s/exec';
+
+    // 주소 검색 레이어 (embed 방식 - file:// 에서도 동작)
+    var addrLayer = document.createElement('div');
+    addrLayer.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:16px;';
+    addrLayer.innerHTML =
+      '<div style="background:#fff;border-radius:16px;overflow:hidden;width:100%;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,0.3);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e2e8f0;">' +
+          '<span style="font-size:15px;font-weight:700;color:#2d3748;">주소 검색</span>' +
+          '<button id="addrCloseBtn" style="background:none;border:none;font-size:22px;cursor:pointer;color:#718096;line-height:1;">✕</button>' +
+        '</div>' +
+        '<div id="addrEmbed" style="height:450px;"></div>' +
+      '</div>';
+    document.body.appendChild(addrLayer);
+
+    document.getElementById('addrCloseBtn').addEventListener('click', function() {
+      addrLayer.style.display = 'none';
+    });
+    addrLayer.addEventListener('click', function(e) {
+      if (e.target === addrLayer) addrLayer.style.display = 'none';
+    });
+
+    function searchAddress() {
+      var embedEl = document.getElementById('addrEmbed');
+      embedEl.innerHTML = '';
+      addrLayer.style.display = 'flex';
+
+      new daum.Postcode({
+        width: '100%',
+        height: '450px',
+        oncomplete: function(data) {
+          document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+          document.getElementById('address').classList.remove('has-error');
+          document.getElementById('addressError').style.display = 'none';
+          addrLayer.style.display = 'none';
+          document.getElementById('addressDetail').focus();
+        }
+      }).embed(embedEl);
+    }
+
+    // 전화번호 자동 하이픈 (공통)
+    function formatPhone(input) {
+      let v = input.value.replace(/\D/g, '').substring(0, 11);
+      if (v.length >= 8) v = v.replace(/^(\d{3})(\d{4})(\d{0,4})$/, '$1-$2-$3');
+      else if (v.length >= 4) v = v.replace(/^(\d{3})(\d{0,4})$/, '$1-$2');
+      input.value = v;
+    }
+    document.getElementById('phone').addEventListener('input', function() { formatPhone(this); });
+
+    // 생년월일 자동 포맷 (19820718 → 1982/07/18)
+    function formatBirthday(input) {
+      let v = input.value.replace(/\D/g, '').substring(0, 8);
+      if (v.length >= 7) v = v.replace(/^(\d{4})(\d{2})(\d{0,2})$/, '$1/$2/$3');
+      else if (v.length >= 5) v = v.replace(/^(\d{4})(\d{0,2})$/, '$1/$2');
+      input.value = v;
+    }
+    document.getElementById('birthday').addEventListener('input', function() { formatBirthday(this); });
+
+    // 개인정보 동의 토글
+    function toggleConsent() {
+      const el = document.getElementById('consentDetail');
+      const btn = document.querySelector('.consent-toggle');
+      const open = el.style.display === 'none';
+      el.style.display = open ? 'block' : 'none';
+      btn.textContent = '개인정보 수집·이용 안내 ' + (open ? '접기 ▴' : '보기 ▾');
+    }
+
+    // 가족 정보 추가/삭제
+    let familySeq = 0;
+    const familyIds = [];
+
+    function addFamilyMember() {
+      familySeq++;
+      const id = familySeq;
+      familyIds.push(id);
+
+      const sec = document.createElement('div');
+      sec.className = 'family-section';
+      sec.id = 'family-' + id;
+      sec.innerHTML =
+        '<div class="family-header">' +
+          '<span class="family-title">가족 ' + familyIds.length + '번째</span>' +
+          '<button type="button" class="family-remove-btn" onclick="removeFamilyMember(' + id + ')">삭제</button>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="form-label">이름 <span class="req">*</span></label>' +
+          '<input type="text" id="f' + id + '_name" placeholder="홍길동">' +
+          '<div class="error-msg" id="f' + id + '_nameErr">이름을 입력해 주세요.</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="form-label">생년월일 <span class="req">*</span></label>' +
+          '<input type="text" id="f' + id + '_birthday" placeholder="예: 1982/07/18" inputmode="numeric" maxlength="10" oninput="formatBirthday(this)">' +
+          '<div class="error-msg" id="f' + id + '_birthdayErr">생년월일을 입력해 주세요. (예: 1982/07/18)</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="form-label">성별 <span class="req">*</span></label>' +
+          '<div class="radio-group">' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_male" name="f' + id + '_gender" value="남성">' +
+              '<label for="f' + id + '_male">남성</label>' +
+            '</div>' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_female" name="f' + id + '_gender" value="여성">' +
+              '<label for="f' + id + '_female">여성</label>' +
+            '</div>' +
+          '</div>' +
+          '<div class="gender-error" id="f' + id + '_genderErr">성별을 선택해 주세요.</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="form-label">전화번호 <span class="opt">(선택)</span></label>' +
+          '<input type="tel" id="f' + id + '_phone" placeholder="010-0000-0000" inputmode="numeric" oninput="formatPhone(this)">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="form-label">차량번호 <span class="opt">(선택)</span></label>' +
+          '<input type="text" id="f' + id + '_carNumber" placeholder="예: 12가 3456">' +
+        '</div>' +
+        '<div class="form-group" style="margin-bottom:0;">' +
+          '<label class="form-label">세례 여부 <span class="opt">(선택)</span></label>' +
+          '<div class="radio-group">' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_regular" name="f' + id + '_baptism" value="세례(입교)">' +
+              '<label for="f' + id + '_baptism_regular">세례(입교)</label>' +
+            '</div>' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_infant" name="f' + id + '_baptism" value="유아세례">' +
+              '<label for="f' + id + '_baptism_infant">유아세례</label>' +
+            '</div>' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_none" name="f' + id + '_baptism" value="받지않음">' +
+              '<label for="f' + id + '_baptism_none">받지않음</label>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById('familyList').appendChild(sec);
+    }
+
+    function removeFamilyMember(id) {
+      const el = document.getElementById('family-' + id);
+      if (el) el.remove();
+      const idx = familyIds.indexOf(id);
+      if (idx > -1) familyIds.splice(idx, 1);
+    }
+
+    // 유효성 검사
+    function validate() {
+      let ok = true;
+
+      const clearField = (id, errId) => {
+        document.getElementById(id).classList.remove('has-error');
+        document.getElementById(errId).style.display = 'none';
+      };
+      const failField = (id, errId) => {
+        document.getElementById(id).classList.add('has-error');
+        document.getElementById(errId).style.display = 'block';
+        ok = false;
+      };
+
+      clearField('name', 'nameError');
+      clearField('phone', 'phoneError');
+      clearField('birthday', 'birthdayError');
+      clearField('address', 'addressError');
+      document.getElementById('genderError').style.display = 'none';
+
+      if (!document.getElementById('name').value.trim()) failField('name', 'nameError');
+      const phone = document.getElementById('phone').value.trim();
+      if (!phone || !/^01[016789]-\d{3,4}-\d{4}$/.test(phone)) failField('phone', 'phoneError');
+      if (!document.getElementById('birthday').value) failField('birthday', 'birthdayError');
+      if (!document.querySelector('input[name="gender"]:checked')) {
+        document.getElementById('genderError').style.display = 'block';
+        ok = false;
+      }
+      if (!document.getElementById('address').value.trim()) failField('address', 'addressError');
+
+      // 개인정보 동의 검사
+      document.getElementById('consentError').style.display = 'none';
+      if (!document.getElementById('consentCheck').checked) {
+        document.getElementById('consentError').style.display = 'block';
+        ok = false;
+      }
+
+      // 가족 유효성 검사
+      familyIds.forEach(function(id) {
+        const nameEl = document.getElementById('f' + id + '_name');
+        const birthdayEl = document.getElementById('f' + id + '_birthday');
+        const nameErr = document.getElementById('f' + id + '_nameErr');
+        const birthdayErr = document.getElementById('f' + id + '_birthdayErr');
+        const genderErr = document.getElementById('f' + id + '_genderErr');
+
+        nameEl.classList.remove('has-error'); nameErr.style.display = 'none';
+        birthdayEl.classList.remove('has-error'); birthdayErr.style.display = 'none';
+        genderErr.style.display = 'none';
+
+        if (!nameEl.value.trim()) { nameEl.classList.add('has-error'); nameErr.style.display = 'block'; ok = false; }
+        if (!birthdayEl.value) { birthdayEl.classList.add('has-error'); birthdayErr.style.display = 'block'; ok = false; }
+        if (!document.querySelector('input[name="f' + id + '_gender"]:checked')) { genderErr.style.display = 'block'; ok = false; }
+      });
+
+      return ok;
+    }
+
+    // 폼 제출
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '제출 중...';
+
+      const address = document.getElementById('address').value.trim();
+      const addressDetail = document.getElementById('addressDetail').value.trim();
+      const fullAddress = addressDetail ? address + ' ' + addressDetail : address;
+
+      // 같은 제출 묶음을 식별할 그룹ID
+      const mainName  = document.getElementById('name').value.trim();
+      const mainPhone = document.getElementById('phone').value.trim();
+      const groupId   = mainName + '(' + mainPhone.slice(-4) + ')';
+
+      // 본인 데이터
+      const requests = [new URLSearchParams({
+        type:      '본인',
+        group:     groupId,
+        name:      mainName,
+        phone:     mainPhone,
+        birthday:  document.getElementById('birthday').value,
+        gender:    document.querySelector('input[name="gender"]:checked').value,
+        address:   fullAddress,
+        carNumber: document.getElementById('carNumber').value.trim(),
+        baptism:   (document.querySelector('input[name="baptism"]:checked') || {}).value || ''
+      })];
+
+      // 가족 데이터
+      familyIds.forEach(function(id) {
+        const genderEl = document.querySelector('input[name="f' + id + '_gender"]:checked');
+        requests.push(new URLSearchParams({
+          type:      '가족',
+          group:     groupId,
+          name:      document.getElementById('f' + id + '_name').value.trim(),
+          phone:     document.getElementById('f' + id + '_phone').value.trim(),
+          birthday:  document.getElementById('f' + id + '_birthday').value,
+          gender:    genderEl ? genderEl.value : '',
+          address:   fullAddress,
+          carNumber: document.getElementById('f' + id + '_carNumber').value.trim(),
+          baptism:   (document.querySelector('input[name="f' + id + '_baptism"]:checked') || {}).value || ''
+        }));
+      });
+
+      try {
+        await Promise.all(requests.map(function(params) {
+          return fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: params });
+        }));
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successSection').style.display = 'block';
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '제출하기';
+        alert('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      }
+    });
+  </script>
+
+</body>
+</html>
