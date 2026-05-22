@@ -499,7 +499,7 @@
 
   <script>
     // ★ Google Apps Script 웹앱 URL을 여기에 붙여넣으세요
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdYxb22sE8VWtOSr44Ceg1vM-pW-qSbJ1i5wtMdBV0iKNN6doGr0G6o9lVRG6LNLiH/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2Brvo8kDy90_f3HvznL3ER6r-POJ7FtgG89ZcDniVm3op5eZsVIpKWtpD4wn9fS8s/exec';
 
     // 주소 검색 레이어 (embed 방식 - file:// 에서도 동작)
     var addrLayer = document.createElement('div');
@@ -602,9 +602,26 @@
           '<label class="form-label">전화번호 <span class="opt">(선택)</span></label>' +
           '<input type="tel" id="f' + id + '_phone" placeholder="010-0000-0000" inputmode="numeric" oninput="formatPhone(this)">' +
         '</div>' +
-        '<div class="form-group" style="margin-bottom:0;">' +
+        '<div class="form-group">' +
           '<label class="form-label">차량번호 <span class="opt">(선택)</span></label>' +
           '<input type="text" id="f' + id + '_carNumber" placeholder="예: 12가 3456">' +
+        '</div>' +
+        '<div class="form-group" style="margin-bottom:0;">' +
+          '<label class="form-label">세례 여부 <span class="opt">(선택)</span></label>' +
+          '<div class="radio-group">' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_regular" name="f' + id + '_baptism" value="세례(입교)">' +
+              '<label for="f' + id + '_baptism_regular">세례(입교)</label>' +
+            '</div>' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_infant" name="f' + id + '_baptism" value="유아세례">' +
+              '<label for="f' + id + '_baptism_infant">유아세례</label>' +
+            '</div>' +
+            '<div class="radio-option">' +
+              '<input type="radio" id="f' + id + '_baptism_none" name="f' + id + '_baptism" value="받지않음">' +
+              '<label for="f' + id + '_baptism_none">받지않음</label>' +
+            '</div>' +
+          '</div>' +
         '</div>';
 
       document.getElementById('familyList').appendChild(sec);
@@ -687,11 +704,17 @@
       const addressDetail = document.getElementById('addressDetail').value.trim();
       const fullAddress = addressDetail ? address + ' ' + addressDetail : address;
 
+      // 같은 제출 묶음을 식별할 그룹ID
+      const mainName  = document.getElementById('name').value.trim();
+      const mainPhone = document.getElementById('phone').value.trim();
+      const groupId   = mainName + '(' + mainPhone.slice(-4) + ')';
+
       // 본인 데이터
       const requests = [new URLSearchParams({
         type:      '본인',
-        name:      document.getElementById('name').value.trim(),
-        phone:     document.getElementById('phone').value.trim(),
+        group:     groupId,
+        name:      mainName,
+        phone:     mainPhone,
         birthday:  document.getElementById('birthday').value,
         gender:    document.querySelector('input[name="gender"]:checked').value,
         address:   fullAddress,
@@ -704,12 +727,14 @@
         const genderEl = document.querySelector('input[name="f' + id + '_gender"]:checked');
         requests.push(new URLSearchParams({
           type:      '가족',
+          group:     groupId,
           name:      document.getElementById('f' + id + '_name').value.trim(),
           phone:     document.getElementById('f' + id + '_phone').value.trim(),
           birthday:  document.getElementById('f' + id + '_birthday').value,
           gender:    genderEl ? genderEl.value : '',
-          address:   '',
-          carNumber: document.getElementById('f' + id + '_carNumber').value.trim()
+          address:   fullAddress,
+          carNumber: document.getElementById('f' + id + '_carNumber').value.trim(),
+          baptism:   (document.querySelector('input[name="f' + id + '_baptism"]:checked') || {}).value || ''
         }));
       });
 
